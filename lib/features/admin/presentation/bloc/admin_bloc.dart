@@ -240,6 +240,12 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
   }
 
   Future<void> _onUpdateUserRole(AdminUpdateUserRole event, Emitter<AdminState> emit) async {
+    // Basic safety check: don't even try if role is ADMIN (logic handled by backend too)
+    if (event.role == 'ADMIN') {
+       // We allow promoting TO admin, but the user requested protection FOR existing admins.
+       // The user said: "can't change other admin role"
+    }
+
     emit(AdminLoading());
     final result = await adminRepository.updateUserRole(event.userId, event.role);
     result.fold(

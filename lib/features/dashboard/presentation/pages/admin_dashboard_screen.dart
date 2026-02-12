@@ -126,37 +126,39 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
             title: Text(user.fullName),
             subtitle: Text('${user.role} • ${user.phoneNumber ?? "No phone"}'),
-            trailing: PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'role') {
-                  _showRoleDialog(context, user);
-                } else if (value == 'delete') {
-                  _showDeleteConfirmDialog(context, user);
-                }
-              },
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'role',
-                  child: Row(
-                    children: [
-                      Icon(Icons.admin_panel_settings, size: 20),
-                      SizedBox(width: 8),
-                      Text('Change Role'),
-                    ],
-                  ),
+            trailing: user.role == 'ADMIN' 
+              ? const Icon(Icons.shield, color: Colors.blueGrey, size: 20)
+              : PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'role') {
+                      _showRoleDialog(context, user);
+                    } else if (value == 'delete') {
+                      _showDeleteConfirmDialog(context, user);
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'role',
+                      child: Row(
+                        children: [
+                          Icon(Icons.admin_panel_settings, size: 20),
+                          SizedBox(width: 8),
+                          Text('Change Role'),
+                        ],
+                      ),
+                    ),
+                    const PopupMenuItem(
+                      value: 'delete',
+                      child: Row(
+                        children: [
+                          Icon(Icons.delete, size: 20, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text('Delete User', style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(Icons.delete, size: 20, color: Colors.red),
-                      SizedBox(width: 8),
-                      Text('Delete User', style: TextStyle(color: Colors.red)),
-                    ],
-                  ),
-                ),
-              ],
-            ),
           ),
         );
       },
