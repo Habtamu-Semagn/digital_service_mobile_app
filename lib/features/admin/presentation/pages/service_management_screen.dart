@@ -68,7 +68,7 @@ class _ServiceManagementScreenState extends State<ServiceManagementScreen> {
                       child: ListTile(
                         leading: Icon(_getIcon(service['icon'])),
                         title: Text(service['name']),
-                        subtitle: Text(service['serviceMode'] ?? 'General'),
+                        subtitle: Text(service['mode'] ?? 'General'),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -100,46 +100,92 @@ class _ServiceManagementScreenState extends State<ServiceManagementScreen> {
   void _showServiceDialog(BuildContext context, {Map<String, dynamic>? service, required String sectorId}) {
     final nameController = TextEditingController(text: service?['name']);
     final descController = TextEditingController(text: service?['description']);
-    final modeController = TextEditingController(text: service?['serviceMode'] ?? 'QUEUE');
     final iconController = TextEditingController(text: service?['icon'] ?? 'confirmation_number');
+    String selectedMode = service?['mode'] ?? 'QUEUE';
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(service == null ? 'Create Service' : 'Edit Service'),
-        content: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(controller: nameController, decoration: const InputDecoration(labelText: 'Name')),
-              TextField(controller: descController, decoration: const InputDecoration(labelText: 'Description')),
-              TextField(controller: modeController, decoration: const InputDecoration(labelText: 'Mode (ONLINE/QUEUE/APPOINTMENT)')),
-              TextField(controller: iconController, decoration: const InputDecoration(labelText: 'Icon Name')),
-            ],
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text(service == null ? 'Create Service' : 'Edit Service'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Service Name',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.title),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: descController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    labelText: 'Description',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.description),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: selectedMode,
+                  decoration: const InputDecoration(
+                    labelText: 'Service Mode',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.settings),
+                  ),
+                  items: ['ONLINE', 'QUEUE', 'APPOINTMENT'].map((mode) {
+                    return DropdownMenuItem(value: mode, child: Text(mode));
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setDialogState(() => selectedMode = value);
+                    }
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: iconController,
+                  decoration: const InputDecoration(
+                    labelText: 'Icon Name',
+                    border: OutlineInputBorder(),
+                    prefixIcon: Icon(Icons.insert_emoticon),
+                    helperText: 'e.g., confirmation_number, calendar_today',
+                  ),
+                ),
+              ],
+            ),
           ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                final data = {
+                  'name': nameController.text,
+                  'description': descController.text,
+                  'mode': selectedMode,
+                  'icon': iconController.text,
+                  'sectorId': sectorId,
+                  'availability': 'FULL_TIME',
+                };
+                if (service == null) {
+                  this.context.read<AdminBloc>().add(AdminCreateService(data));
+                } else {
+                  this.context.read<AdminBloc>().add(AdminUpdateService(service['id'], data));
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () {
-              final data = {
-                'name': nameController.text,
-                'description': descController.text,
-                'serviceMode': modeController.text,
-                'icon': iconController.text,
-                'sectorId': sectorId,
-                'availability': 'FULL_TIME',
-              };
-              if (service == null) {
-                this.context.read<AdminBloc>().add(AdminCreateService(data));
-              } else {
-                this.context.read<AdminBloc>().add(AdminUpdateService(service['id'], data));
-              }
-              Navigator.pop(context);
-            },
-            child: const Text('Save'),
-          ),
-        ],
       ),
     );
   }

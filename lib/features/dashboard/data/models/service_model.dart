@@ -49,7 +49,7 @@ class ServiceModel {
       sector: json['sector'] ?? '',
       sectorAm: json['sectorAm'],
       sectorId: json['sectorId'] ?? '',
-      serviceMode: json['serviceMode'] ?? 'QUEUE',
+      serviceMode: json['mode'] ?? json['serviceMode'] ?? 'QUEUE',
       icon: json['icon'] ?? 'FileText',
       isAvailable: json['isAvailable'] ?? false,
       requiredDocuments: (json['requiredDocuments'] as List<dynamic>?)
