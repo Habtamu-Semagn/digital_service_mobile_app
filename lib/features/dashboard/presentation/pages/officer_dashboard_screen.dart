@@ -10,6 +10,7 @@ import '../../domain/entities/service.dart';
 import '../bloc/officer_bloc.dart';
 import '../../../appointment/domain/entities/appointment.dart';
 import '../../../requests/domain/entities/request.dart';
+import '../../../requests/presentation/widgets/request_data_viewer.dart';
 import 'package:intl/intl.dart';
 
 class OfficerDashboardScreen extends StatefulWidget {
@@ -382,12 +383,11 @@ class _OfficerDashboardScreenState extends State<OfficerDashboardScreen> {
                   subtitle: Text('Status: ${req.status}'),
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Data:', style: TextStyle(fontWeight: FontWeight.bold)),
-                          Text(req.data.toString()),
+                          RequestDataViewer(data: req.data ?? {}),
                           const SizedBox(height: 16),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,

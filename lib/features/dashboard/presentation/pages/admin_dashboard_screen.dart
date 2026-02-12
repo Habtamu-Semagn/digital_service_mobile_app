@@ -105,7 +105,7 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
         _buildStatCard(context, 'Total Citizens', stats.users.toString(), Icons.people, Colors.blue),
         _buildStatCard(context, 'Total Tickets', stats.queues.toString(), Icons.confirmation_number, Colors.orange),
         _buildStatCard(context, 'Active Sectors', stats.sectors.toString(), Icons.business, Colors.green),
-        _buildStatCard(context, 'Uptime', stats.uptime, Icons.security, Colors.teal),
+        _buildStatCard(context, 'Total Services', stats.services.toString(), Icons.home_repair_service, Colors.indigo),
       ],
     );
   }
