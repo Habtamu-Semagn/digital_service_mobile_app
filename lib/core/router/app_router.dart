@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/presentation/pages/login_screen.dart';
-import '../../features/dashboard/presentation/pages/dashboard_screen.dart';
+import '../../features/dashboard/presentation/pages/citizen_dashboard_screen.dart';
+import '../../features/dashboard/presentation/pages/officer_dashboard_screen.dart';
+import '../../features/dashboard/presentation/pages/admin_dashboard_screen.dart';
 import '../../features/help_desk/presentation/pages/help_desk_screen.dart';
 import '../../features/queue/presentation/pages/queue_generate_screen.dart';
 import '../../features/appointment/presentation/pages/appointment_book_screen.dart';
@@ -52,7 +54,35 @@ class AppRouter {
       GoRoute(
         path: '/dashboard',
         name: 'dashboard',
-        builder: (context, state) => const DashboardScreen(),
+        redirect: (context, state) async {
+          final authRepository = getIt<AuthRepository>();
+          final result = await authRepository.getCurrentUser();
+          
+          return result.fold(
+            (failure) => '/login',
+            (user) {
+              final role = user.role.toUpperCase();
+              if (role == 'ADMIN') return '/admin';
+              if (role == 'OFFICER' || role == 'HELPDESK') return '/officer';
+              return '/citizen';
+            },
+          );
+        },
+      ),
+      GoRoute(
+        path: '/citizen',
+        name: 'citizen-dashboard',
+        builder: (context, state) => const CitizenDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/officer',
+        name: 'officer-dashboard',
+        builder: (context, state) => const OfficerDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/admin',
+        name: 'admin-dashboard',
+        builder: (context, state) => const AdminDashboardScreen(),
       ),
       GoRoute(
         path: '/help-desk/:serviceId',

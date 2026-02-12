@@ -18,6 +18,9 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
     on<QueueStartPolling>(_onStartPolling);
     on<QueueStopPolling>(_onStopPolling);
     on<QueueUpdate>(_onUpdateQueue);
+    on<QueueLoadList>(_onLoadList);
+    on<QueueUpdateStatus>(_onUpdateStatus);
+    on<QueueRegisterWalkIn>(_onRegisterWalkIn);
   }
 
   Future<void> _onGenerateQueue(
@@ -108,5 +111,41 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
   Future<void> close() {
     _pollingTimer?.cancel();
     return super.close();
+  }
+
+  Future<void> _onLoadList(
+    QueueLoadList event,
+    Emitter<QueueState> emit,
+  ) async {
+    emit(QueueLoading());
+    final result = await queueRepository.getQueueList(event.sectorId);
+    result.fold(
+      (failure) => emit(QueueError(message: failure.message)),
+      (queues) => emit(QueueListLoaded(queues: queues)),
+    );
+  }
+
+  Future<void> _onUpdateStatus(
+    QueueUpdateStatus event,
+    Emitter<QueueState> emit,
+  ) async {
+    emit(QueueLoading());
+    final result = await queueRepository.updateQueueStatus(event.queueId, event.status);
+    result.fold(
+      (failure) => emit(QueueError(message: failure.message)),
+      (queue) => emit(QueueActionSuccess(message: 'Status updated to ${event.status}', queue: queue)),
+    );
+  }
+
+  Future<void> _onRegisterWalkIn(
+    QueueRegisterWalkIn event,
+    Emitter<QueueState> emit,
+  ) async {
+    emit(QueueLoading());
+    final result = await queueRepository.registerWalkIn(event.name, event.phoneNumber, event.serviceId);
+    result.fold(
+      (failure) => emit(QueueError(message: failure.message)),
+      (queue) => emit(QueueActionSuccess(message: 'Walk-in registered successfully', queue: queue)),
+    );
   }
 }

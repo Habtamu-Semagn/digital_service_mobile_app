@@ -39,3 +39,22 @@ class QueueError extends QueueState {
   @override
   List<Object?> get props => [message];
 }
+
+class QueueListLoaded extends QueueState {
+  final List<Queue> queues;
+
+  const QueueListLoaded({required this.queues});
+
+  @override
+  List<Object?> get props => [queues];
+}
+
+class QueueActionSuccess extends QueueState {
+  final String message;
+  final Queue? queue;
+
+  const QueueActionSuccess({required this.message, this.queue});
+
+  @override
+  List<Object?> get props => [message, queue];
+}

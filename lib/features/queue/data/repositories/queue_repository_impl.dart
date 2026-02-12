@@ -39,4 +39,34 @@ class QueueRepositoryImpl implements QueueRepository {
       return Left(ErrorHandler.handleException(e));
     }
   }
+
+  @override
+  Future<Either<Failure, List<Queue>>> getQueueList(String sectorId) async {
+    try {
+      final queues = await remoteDataSource.getQueueList(sectorId);
+      return Right(queues.map((m) => m.toEntity()).toList());
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Queue>> updateQueueStatus(String queueId, String status) async {
+    try {
+      final queue = await remoteDataSource.updateQueueStatus(queueId, status);
+      return Right(queue.toEntity());
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Queue>> registerWalkIn(String name, String phoneNumber, String serviceId) async {
+    try {
+      final queue = await remoteDataSource.registerWalkIn(name, phoneNumber, serviceId);
+      return Right(queue.toEntity());
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
 }

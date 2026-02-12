@@ -34,4 +34,30 @@ class QueueRemoteDataSource {
     final queueResponse = QueueResponse.fromJson(response.data);
     return queueResponse.data;
   }
+
+  Future<List<QueueModel>> getQueueList(String sectorId) async {
+    final response = await _client.get('/queues/list/$sectorId');
+    final List<dynamic> data = response.data;
+    return data.map((json) => QueueModel.fromJson(json)).toList();
+  }
+
+  Future<QueueModel> updateQueueStatus(String queueId, String status) async {
+    final response = await _client.patch(
+      '/queues/$queueId/status',
+      data: {'status': status},
+    );
+    return QueueModel.fromJson(response.data);
+  }
+
+  Future<QueueModel> registerWalkIn(String name, String phoneNumber, String serviceId) async {
+    final response = await _client.post(
+      '/queues/walk-in',
+      data: {
+        'name': name,
+        'phoneNumber': phoneNumber,
+        'serviceId': serviceId,
+      },
+    );
+    return QueueModel.fromJson(response.data);
+  }
 }
