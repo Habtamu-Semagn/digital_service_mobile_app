@@ -32,6 +32,7 @@ class ServiceRemoteDataSource {
           'descriptionAm': serviceMap['descriptionAm'],
           'sector': sectorName, // Use sector name instead of nested object
           'sectorAm': null,
+          'sectorId': sectorMap['id'] ?? '', // Use the UUID from the sector
           'serviceMode': serviceMap['mode'] ?? 'QUEUE',
           'icon': serviceMap['icon'] ?? sectorIcon ?? 'FileText',
           'isAvailable': serviceMap['availability'] != null,

@@ -197,12 +197,16 @@ Body: ${options.data}
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    _logger.d('''
+    try {
+      _logger.d('''
 📥 RESPONSE
 Status Code: ${response.statusCode}
-URL: ${response.requestOptions.path}
-Data: ${response.data}
-    ''');
+URL: ${response.requestOptions.path.toString()}
+Data: ${response.data.toString()}
+      ''');
+    } catch (e) {
+      _logger.e('Error logging response: $e');
+    }
     handler.next(response);
   }
 

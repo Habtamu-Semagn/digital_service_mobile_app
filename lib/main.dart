@@ -12,6 +12,7 @@ import 'features/appointment/presentation/bloc/appointment_bloc.dart';
 import 'features/notifications/presentation/bloc/notification_bloc.dart';
 import 'features/requests/presentation/bloc/request_bloc.dart';
 import 'features/admin/presentation/bloc/admin_bloc.dart';
+import 'features/dashboard/presentation/bloc/officer_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -49,6 +50,9 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<AdminBloc>(
           create: (context) => getIt<AdminBloc>(),
+        ),
+        BlocProvider<OfficerBloc>(
+          create: (context) => getIt<OfficerBloc>(),
         ),
       ],
       child: MaterialApp.router(

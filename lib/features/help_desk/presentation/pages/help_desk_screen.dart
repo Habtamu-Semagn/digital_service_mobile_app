@@ -6,6 +6,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/utils/app_localizations.dart';
 import '../../../dashboard/domain/entities/service.dart';
 import '../../../dashboard/presentation/bloc/dashboard_bloc.dart';
+import '../../../queue/presentation/bloc/queue_bloc.dart';
 
 class HelpDeskScreen extends StatelessWidget {
   final String serviceId;
@@ -300,15 +301,22 @@ class HelpDeskScreen extends StatelessWidget {
         );
 
       case AppConstants.serviceModeQueue:
-        return ElevatedButton.icon(
-          onPressed: () {
-            context.push('/queue/generate/${service.id}');
+        return BlocBuilder<QueueBloc, QueueState>(
+          builder: (context, queueState) {
+            final hasActiveQueue = queueState is QueueActive;
+            
+            return ElevatedButton.icon(
+              onPressed: () {
+                context.push('/queue/generate/${service.id}');
+              },
+              icon: Icon(hasActiveQueue ? Icons.visibility : Icons.confirmation_number),
+              label: Text(hasActiveQueue ? 'View Your Ticket' : l10n.takeQueueNumber),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                backgroundColor: hasActiveQueue ? Colors.orange : null,
+              ),
+            );
           },
-          icon: const Icon(Icons.confirmation_number),
-          label: Text(l10n.takeQueueNumber),
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-          ),
         );
 
       case AppConstants.serviceModeAppointment:

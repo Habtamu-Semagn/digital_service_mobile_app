@@ -20,6 +20,7 @@ RequestModel _$RequestModelFromJson(Map<String, dynamic> json) => RequestModel(
       appointmentDate: json['appointmentDate'] as String?,
       appointmentTimeSlot: json['appointmentTimeSlot'] as String?,
       rejectionReason: json['rejectionReason'] as String?,
+      data: json['data'] as Map<String, dynamic>?,
     );
 
 Map<String, dynamic> _$RequestModelToJson(RequestModel instance) =>
@@ -37,4 +38,5 @@ Map<String, dynamic> _$RequestModelToJson(RequestModel instance) =>
       'appointmentDate': instance.appointmentDate,
       'appointmentTimeSlot': instance.appointmentTimeSlot,
       'rejectionReason': instance.rejectionReason,
+      'data': instance.data,
     };

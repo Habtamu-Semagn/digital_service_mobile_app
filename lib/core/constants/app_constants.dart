@@ -35,14 +35,14 @@ class AppConstants {
   
   // Queue Status
   static const String queueStatusWaiting = 'WAITING';
-  static const String queueStatusCalled = 'CALLED';
-  static const String queueStatusInService = 'IN_SERVICE';
+  static const String queueStatusCalled = 'CALLING';
+  static const String queueStatusInService = 'PROCESSING';
   static const String queueStatusCompleted = 'COMPLETED';
   static const String queueStatusCancelled = 'CANCELLED';
-  static const String queueStatusNoShow = 'NO_SHOW';
+  static const String queueStatusNoShow = 'REJECTED';
   
   // Appointment Status
-  static const String appointmentStatusConfirmed = 'CONFIRMED';
+  static const String appointmentStatusScheduled = 'SCHEDULED';
   static const String appointmentStatusCancelled = 'CANCELLED';
   static const String appointmentStatusCompleted = 'COMPLETED';
   static const String appointmentStatusNoShow = 'NO_SHOW';

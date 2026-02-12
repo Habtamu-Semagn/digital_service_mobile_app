@@ -13,5 +13,6 @@ abstract class AppointmentRepository {
     String timeSlot,
   );
   Future<Either<Failure, List<Appointment>>> getMyAppointments();
+  Future<Either<Failure, List<Appointment>>> getSectorAppointments(String sectorId);
   Future<Either<Failure, void>> cancelAppointment(String appointmentId);
 }

@@ -37,8 +37,20 @@ class AppointmentModel {
     this.cancellationReason,
   });
 
-  factory AppointmentModel.fromJson(Map<String, dynamic> json) =>
-      _$AppointmentModelFromJson(json);
+  factory AppointmentModel.fromJson(Map<String, dynamic> json) {
+    return AppointmentModel(
+      id: json['id'] ?? '',
+      serviceId: json['serviceId'],
+      serviceName: _readServiceName(json, 'serviceName') as String,
+      serviceNameAm: _readServiceNameAm(json, 'serviceNameAm') as String?,
+      userId: json['userId'],
+      appointmentDate: (json['date'] ?? json['appointmentDate'] ?? DateTime.now().toIso8601String()).toString(),
+      timeSlot: json['timeSlot'] ?? '---',
+      status: json['status'] ?? 'SCHEDULED',
+      createdAt: json['createdAt'] ?? DateTime.now().toIso8601String(),
+      cancellationReason: json['cancellationReason'],
+    );
+  }
 
   Map<String, dynamic> toJson() => _$AppointmentModelToJson(this);
 
@@ -84,8 +96,12 @@ class TimeSlotModel {
     required this.isAvailable,
   });
 
-  factory TimeSlotModel.fromJson(Map<String, dynamic> json) =>
-      _$TimeSlotModelFromJson(json);
+  factory TimeSlotModel.fromJson(Map<String, dynamic> json) {
+    return TimeSlotModel(
+      slot: json['slot'] ?? '---',
+      isAvailable: json['isAvailable'] ?? false,
+    );
+  }
 
   Map<String, dynamic> toJson() => _$TimeSlotModelToJson(this);
 

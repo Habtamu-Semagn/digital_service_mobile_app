@@ -60,6 +60,20 @@ class AppointmentRemoteDataSource {
     return list.map((json) => AppointmentModel.fromJson(json)).toList();
   }
 
+  Future<List<AppointmentModel>> getSectorAppointments(String sectorId) async {
+    final response = await _client.get('/appointments/sector/$sectorId');
+    final dynamic data = response.data;
+    List<dynamic> list = [];
+    
+    if (data is List) {
+      list = data;
+    } else if (data is Map && data.containsKey('data') && data['data'] is List) {
+      list = data['data'];
+    }
+    
+    return list.map((json) => AppointmentModel.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
   Future<void> cancelAppointment(String appointmentId) async {
     await _client.delete('/appointments/$appointmentId');
   }

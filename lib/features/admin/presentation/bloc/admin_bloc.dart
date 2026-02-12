@@ -15,6 +15,49 @@ abstract class AdminEvent extends Equatable {
 class AdminLoadStats extends AdminEvent {}
 class AdminLoadUsers extends AdminEvent {}
 class AdminLoadLogs extends AdminEvent {}
+class AdminLoadSectors extends AdminEvent {}
+
+// Sector Events
+class AdminCreateSector extends AdminEvent {
+  final Map<String, dynamic> data;
+  const AdminCreateSector(this.data);
+  @override
+  List<Object?> get props => [data];
+}
+class AdminUpdateSector extends AdminEvent {
+  final String id;
+  final Map<String, dynamic> data;
+  const AdminUpdateSector(this.id, this.data);
+  @override
+  List<Object?> get props => [id, data];
+}
+class AdminDeleteSector extends AdminEvent {
+  final String id;
+  const AdminDeleteSector(this.id);
+  @override
+  List<Object?> get props => [id];
+}
+
+// Service Events
+class AdminCreateService extends AdminEvent {
+  final Map<String, dynamic> data;
+  const AdminCreateService(this.data);
+  @override
+  List<Object?> get props => [data];
+}
+class AdminUpdateService extends AdminEvent {
+  final String id;
+  final Map<String, dynamic> data;
+  const AdminUpdateService(this.id, this.data);
+  @override
+  List<Object?> get props => [id, data];
+}
+class AdminDeleteService extends AdminEvent {
+  final String id;
+  const AdminDeleteService(this.id);
+  @override
+  List<Object?> get props => [id];
+}
 
 // States
 abstract class AdminState extends Equatable {
@@ -43,9 +86,22 @@ class AdminLogsLoaded extends AdminState {
   @override
   List<Object?> get props => [logs];
 }
+class AdminSectorsLoaded extends AdminState {
+  final List<Map<String, dynamic>> sectors;
+  const AdminSectorsLoaded(this.sectors);
+  @override
+  List<Object?> get props => [sectors];
+}
 class AdminError extends AdminState {
   final String message;
   const AdminError(this.message);
+  @override
+  List<Object?> get props => [message];
+}
+
+class AdminActionSuccess extends AdminState {
+  final String message;
+  const AdminActionSuccess(this.message);
   @override
   List<Object?> get props => [message];
 }
@@ -58,6 +114,17 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<AdminLoadStats>(_onLoadStats);
     on<AdminLoadUsers>(_onLoadUsers);
     on<AdminLoadLogs>(_onLoadLogs);
+    on<AdminLoadSectors>(_onLoadSectors);
+    
+    // Sector handlers
+    on<AdminCreateSector>(_onCreateSector);
+    on<AdminUpdateSector>(_onUpdateSector);
+    on<AdminDeleteSector>(_onDeleteSector);
+    
+    // Service handlers
+    on<AdminCreateService>(_onCreateService);
+    on<AdminUpdateService>(_onUpdateService);
+    on<AdminDeleteService>(_onDeleteService);
   }
 
   Future<void> _onLoadStats(AdminLoadStats event, Emitter<AdminState> emit) async {
@@ -84,6 +151,71 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     result.fold(
       (failure) => emit(AdminError(failure.message)),
       (logs) => emit(AdminLogsLoaded(logs)),
+    );
+  }
+
+  Future<void> _onLoadSectors(AdminLoadSectors event, Emitter<AdminState> emit) async {
+    emit(AdminLoading());
+    final result = await adminRepository.getSectors();
+    result.fold(
+      (failure) => emit(AdminError(failure.message)),
+      (sectors) => emit(AdminSectorsLoaded(sectors)),
+    );
+  }
+
+  // Sector Handlers
+  Future<void> _onCreateSector(AdminCreateSector event, Emitter<AdminState> emit) async {
+    emit(AdminLoading());
+    final result = await adminRepository.createSector(event.data);
+    result.fold(
+      (failure) => emit(AdminError(failure.message)),
+      (_) => emit(const AdminActionSuccess('Sector created successfully')),
+    );
+  }
+
+  Future<void> _onUpdateSector(AdminUpdateSector event, Emitter<AdminState> emit) async {
+    emit(AdminLoading());
+    final result = await adminRepository.updateSector(event.id, event.data);
+    result.fold(
+      (failure) => emit(AdminError(failure.message)),
+      (_) => emit(const AdminActionSuccess('Sector updated successfully')),
+    );
+  }
+
+  Future<void> _onDeleteSector(AdminDeleteSector event, Emitter<AdminState> emit) async {
+    emit(AdminLoading());
+    final result = await adminRepository.deleteSector(event.id);
+    result.fold(
+      (failure) => emit(AdminError(failure.message)),
+      (_) => emit(const AdminActionSuccess('Sector deleted successfully')),
+    );
+  }
+
+  // Service Handlers
+  Future<void> _onCreateService(AdminCreateService event, Emitter<AdminState> emit) async {
+    emit(AdminLoading());
+    final result = await adminRepository.createService(event.data);
+    result.fold(
+      (failure) => emit(AdminError(failure.message)),
+      (_) => emit(const AdminActionSuccess('Service created successfully')),
+    );
+  }
+
+  Future<void> _onUpdateService(AdminUpdateService event, Emitter<AdminState> emit) async {
+    emit(AdminLoading());
+    final result = await adminRepository.updateService(event.id, event.data);
+    result.fold(
+      (failure) => emit(AdminError(failure.message)),
+      (_) => emit(const AdminActionSuccess('Service updated successfully')),
+    );
+  }
+
+  Future<void> _onDeleteService(AdminDeleteService event, Emitter<AdminState> emit) async {
+    emit(AdminLoading());
+    final result = await adminRepository.deleteService(event.id);
+    result.fold(
+      (failure) => emit(AdminError(failure.message)),
+      (_) => emit(const AdminActionSuccess('Service deleted successfully')),
     );
   }
 }

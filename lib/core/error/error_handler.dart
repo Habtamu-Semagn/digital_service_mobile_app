@@ -93,7 +93,7 @@ class ErrorHandler {
         } else if (errorData is String) {
           message = errorData;
         }
-      } else if (data.containsKey('message')) {
+      } else if (data.containsKey('message') && data['message'] != null) {
         message = data['message'];
       }
     }

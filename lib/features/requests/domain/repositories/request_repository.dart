@@ -10,5 +10,7 @@ abstract class RequestRepository {
   });
   
   Future<Either<Failure, List<Request>>> getMyRequests();
+  Future<Either<Failure, List<Request>>> getSectorRequests(String sectorId);
   Future<Either<Failure, Request>> getRequestById(String requestId);
+  Future<Either<Failure, void>> updateRequestStatus(String requestId, String status, String? remarks);
 }

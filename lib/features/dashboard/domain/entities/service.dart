@@ -8,6 +8,7 @@ class Service extends Equatable {
   final String? descriptionAm;
   final String sector;
   final String? sectorAm;
+  final String sectorId;
   final String serviceMode; // ONLINE, QUEUE, APPOINTMENT
   final String icon;
   final bool isAvailable;
@@ -24,6 +25,7 @@ class Service extends Equatable {
     this.descriptionAm,
     required this.sector,
     this.sectorAm,
+    required this.sectorId,
     required this.serviceMode,
     required this.icon,
     required this.isAvailable,
@@ -42,6 +44,7 @@ class Service extends Equatable {
         descriptionAm,
         sector,
         sectorAm,
+        sectorId,
         serviceMode,
         icon,
         isAvailable,

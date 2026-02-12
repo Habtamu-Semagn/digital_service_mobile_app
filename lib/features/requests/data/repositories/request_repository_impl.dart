@@ -47,4 +47,24 @@ class RequestRepositoryImpl implements RequestRepository {
       return Left(ErrorHandler.handleException(e));
     }
   }
+
+  @override
+  Future<Either<Failure, List<Request>>> getSectorRequests(String sectorId) async {
+    try {
+      final models = await remoteDataSource.getSectorRequests(sectorId);
+      return Right(models.map((m) => m.toEntity()).toList());
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateRequestStatus(String requestId, String status, String? remarks) async {
+    try {
+      await remoteDataSource.updateRequestStatus(requestId, status, remarks);
+      return const Right(null);
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
 }

@@ -22,7 +22,11 @@ class _QueueGenerateScreenState extends State<QueueGenerateScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<QueueBloc>().add(QueueGenerate(serviceId: widget.serviceId));
+    final queueState = context.read<QueueBloc>().state;
+    // Only generate if we don't have any active ticket at all
+    if (queueState is! QueueActive && queueState is! QueueGenerated) {
+      context.read<QueueBloc>().add(QueueGenerate(serviceId: widget.serviceId));
+    }
   }
 
   @override
@@ -113,7 +117,7 @@ class _QueueGenerateScreenState extends State<QueueGenerateScreen> {
                     context,
                     Icons.people_outline,
                     l10n.position,
-                    '${queue.position}',
+                    '${queue.position ?? 0}',
                     theme,
                   ),
                   const SizedBox(height: 16),
@@ -123,7 +127,7 @@ class _QueueGenerateScreenState extends State<QueueGenerateScreen> {
                     context,
                     Icons.access_time,
                     l10n.estimatedWait,
-                    queue.estimatedWaitTime,
+                    queue.estimatedWaitTime ?? '---',
                     theme,
                   ),
                   const SizedBox(height: 24),
@@ -288,9 +292,9 @@ class _QueueGenerateScreenState extends State<QueueGenerateScreen> {
     switch (status.toUpperCase()) {
       case 'WAITING':
         return l10n.waiting;
-      case 'CALLED':
+      case 'CALLING':
         return l10n.called;
-      case 'IN_SERVICE':
+      case 'PROCESSING':
         return l10n.inService;
       case 'COMPLETED':
         return l10n.completed;

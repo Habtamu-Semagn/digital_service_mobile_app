@@ -41,4 +41,74 @@ class AdminRepositoryImpl implements AdminRepository {
       return Left(ErrorHandler.handleException(e));
     }
   }
+
+  @override
+  Future<Either<Failure, List<Map<String, dynamic>>>> getSectors() async {
+    try {
+      final sectors = await remoteDataSource.getSectors();
+      return Right(List<Map<String, dynamic>>.from(sectors));
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> createSector(Map<String, dynamic> sectorData) async {
+    try {
+      await remoteDataSource.createSector(sectorData);
+      return const Right(null);
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateSector(String id, Map<String, dynamic> sectorData) async {
+    try {
+      await remoteDataSource.updateSector(id, sectorData);
+      return const Right(null);
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteSector(String id) async {
+    try {
+      await remoteDataSource.deleteSector(id);
+      return const Right(null);
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> createService(Map<String, dynamic> serviceData) async {
+    try {
+      await remoteDataSource.createService(serviceData);
+      return const Right(null);
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> updateService(String id, Map<String, dynamic> serviceData) async {
+    try {
+      await remoteDataSource.updateService(id, serviceData);
+      return const Right(null);
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteService(String id) async {
+    try {
+      await remoteDataSource.deleteService(id);
+      return const Right(null);
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
 }

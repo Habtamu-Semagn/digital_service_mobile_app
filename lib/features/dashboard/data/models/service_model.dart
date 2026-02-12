@@ -12,6 +12,7 @@ class ServiceModel {
   final String? descriptionAm;
   final String sector;
   final String? sectorAm;
+  final String sectorId;
   final String serviceMode;
   final String icon;
   final bool isAvailable;
@@ -28,6 +29,7 @@ class ServiceModel {
     this.descriptionAm,
     required this.sector,
     this.sectorAm,
+    required this.sectorId,
     required this.serviceMode,
     required this.icon,
     required this.isAvailable,
@@ -37,8 +39,28 @@ class ServiceModel {
     this.estimatedProcessingTime,
   });
 
-  factory ServiceModel.fromJson(Map<String, dynamic> json) =>
-      _$ServiceModelFromJson(json);
+  factory ServiceModel.fromJson(Map<String, dynamic> json) {
+    return ServiceModel(
+      id: json['id'] ?? '',
+      name: json['name'] ?? '',
+      nameAm: json['nameAm'],
+      description: json['description'] ?? '',
+      descriptionAm: json['descriptionAm'],
+      sector: json['sector'] ?? '',
+      sectorAm: json['sectorAm'],
+      sectorId: json['sectorId'] ?? '',
+      serviceMode: json['serviceMode'] ?? 'QUEUE',
+      icon: json['icon'] ?? 'FileText',
+      isAvailable: json['isAvailable'] ?? false,
+      requiredDocuments: (json['requiredDocuments'] as List<dynamic>?)
+              ?.map((e) => RequiredDocumentModel.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      onlineInstructions: json['onlineInstructions'],
+      onlineInstructionsAm: json['onlineInstructionsAm'],
+      estimatedProcessingTime: json['estimatedProcessingTime'],
+    );
+  }
 
   Map<String, dynamic> toJson() => _$ServiceModelToJson(this);
 
@@ -51,6 +73,7 @@ class ServiceModel {
       descriptionAm: descriptionAm,
       sector: sector,
       sectorAm: sectorAm,
+      sectorId: sectorId,
       serviceMode: serviceMode,
       icon: icon,
       isAvailable: isAvailable,

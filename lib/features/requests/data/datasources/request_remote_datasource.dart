@@ -32,4 +32,28 @@ class RequestRemoteDataSource {
     final response = await _client.get('/requests/$requestId');
     return RequestModel.fromJson(response.data['data']);
   }
+
+  Future<List<RequestModel>> getSectorRequests(String sectorId) async {
+    final response = await _client.get('/requests/sector/$sectorId');
+    final dynamic data = response.data;
+    List<dynamic> list = [];
+    
+    if (data is List) {
+      list = data;
+    } else if (data is Map && data.containsKey('data') && data['data'] is List) {
+      list = data['data'];
+    }
+    
+    return list.map((json) => RequestModel.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  Future<void> updateRequestStatus(String requestId, String status, String? remarks) async {
+    await _client.patch(
+      '/requests/status/$requestId',
+      data: {
+        'status': status,
+        'remarks': remarks,
+      },
+    );
+  }
 }

@@ -167,7 +167,7 @@ class _CitizenDashboardScreenState extends State<CitizenDashboardScreen> {
       builder: (context, state) {
         if (state is QueueActive) {
           final queue = state.queue;
-          final isCalled = queue.status == 'CALLED' || queue.status == 'IN_SERVICE';
+          final isCalled = queue.status == 'CALLING' || queue.status == 'PROCESSING';
           
           return Card(
             elevation: 8,
@@ -213,7 +213,7 @@ class _CitizenDashboardScreenState extends State<CitizenDashboardScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Text('Estimated Wait', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.bold)),
-                            Text(queue.estimatedWaitTime, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                            Text(queue.estimatedWaitTime ?? '---', style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),

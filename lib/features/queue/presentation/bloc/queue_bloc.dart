@@ -32,7 +32,13 @@ class QueueBloc extends Bloc<QueueEvent, QueueState> {
     final result = await queueRepository.generateQueue(event.serviceId);
 
     result.fold(
-      (failure) => emit(QueueError(message: failure.message)),
+      (failure) {
+        if (failure.message.contains('already have an active queue ticket')) {
+          add(QueueLoadActive());
+        } else {
+          emit(QueueError(message: failure.message));
+        }
+      },
       (queue) {
         emit(QueueGenerated(queue: queue));
         // Start polling for updates

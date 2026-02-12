@@ -63,4 +63,14 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
       return Left(ErrorHandler.handleException(e));
     }
   }
+
+  @override
+  Future<Either<Failure, List<Appointment>>> getSectorAppointments(String sectorId) async {
+    try {
+      final appointments = await remoteDataSource.getSectorAppointments(sectorId);
+      return Right(appointments.map((model) => model.toEntity()).toList());
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
 }

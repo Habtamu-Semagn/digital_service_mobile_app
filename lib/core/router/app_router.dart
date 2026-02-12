@@ -9,6 +9,8 @@ import '../../features/queue/presentation/pages/queue_generate_screen.dart';
 import '../../features/appointment/presentation/pages/appointment_book_screen.dart';
 import '../../features/auth/presentation/pages/profile_edit_screen.dart';
 import '../../features/requests/presentation/pages/request_form_screen.dart';
+import '../../features/admin/presentation/pages/sector_management_screen.dart';
+import '../../features/admin/presentation/pages/service_management_screen.dart';
 import '../../features/dashboard/domain/entities/service.dart' as entity;
 import '../di/injection_container.dart';
 import '../../features/auth/domain/repositories/auth_repository.dart';
@@ -124,6 +126,16 @@ class AppRouter {
           final service = state.extra as entity.Service;
           return RequestFormScreen(service: service);
         },
+      ),
+      GoRoute(
+        path: '/admin/sectors',
+        name: 'admin-sectors',
+        builder: (context, state) => const SectorManagementScreen(),
+      ),
+      GoRoute(
+        path: '/admin/services',
+        name: 'admin-services',
+        builder: (context, state) => const ServiceManagementScreen(),
       ),
       GoRoute(
         path: '/',

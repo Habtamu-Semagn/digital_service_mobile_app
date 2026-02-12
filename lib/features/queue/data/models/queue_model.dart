@@ -33,8 +33,29 @@ class QueueModel {
     this.completedAt,
   });
 
-  factory QueueModel.fromJson(Map<String, dynamic> json) =>
-      _$QueueModelFromJson(json);
+  factory QueueModel.fromJson(Map<String, dynamic> json) {
+    // Handle nested service name if Prisma include: { service: true } is used
+    String sName = json['serviceName'] ?? '';
+    if (sName.isEmpty && json['service'] != null) {
+      sName = json['service']['name'] ?? '';
+    }
+
+    return QueueModel(
+      id: json['id'] ?? '',
+      queueNumber: (json['queueNumber'] ?? json['ticketNumber'] ?? '').toString(),
+      serviceId: json['serviceId'],
+      serviceName: sName,
+      serviceNameAm: json['serviceNameAm'],
+      userId: json['userId'],
+      status: json['status'] ?? 'WAITING',
+      position: json['position'] ?? json['peopleAhead'] ?? 0,
+      estimatedWaitTime: json['estimatedWaitTime'] ?? 
+          (json['peopleAhead'] != null ? '${(json['peopleAhead'] + 1) * 15} min' : '---'),
+      createdAt: json['createdAt'] ?? DateTime.now().toIso8601String(),
+      calledAt: json['calledAt'],
+      completedAt: json['completedAt'],
+    );
+  }
 
   Map<String, dynamic> toJson() => _$QueueModelToJson(this);
 

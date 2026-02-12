@@ -8,4 +8,15 @@ abstract class AdminRepository {
   Future<Either<Failure, AdminStats>> getStats();
   Future<Either<Failure, List<User>>> getUsers();
   Future<Either<Failure, List<SystemLog>>> getLogs();
+  
+  // Sector Management
+  Future<Either<Failure, List<Map<String, dynamic>>>> getSectors();
+  Future<Either<Failure, void>> createSector(Map<String, dynamic> sectorData);
+  Future<Either<Failure, void>> updateSector(String id, Map<String, dynamic> sectorData);
+  Future<Either<Failure, void>> deleteSector(String id);
+
+  // Service Management
+  Future<Either<Failure, void>> createService(Map<String, dynamic> serviceData);
+  Future<Either<Failure, void>> updateService(String id, Map<String, dynamic> serviceData);
+  Future<Either<Failure, void>> deleteService(String id);
 }

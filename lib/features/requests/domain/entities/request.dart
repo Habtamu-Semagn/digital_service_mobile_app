@@ -14,6 +14,7 @@ class Request extends Equatable {
   final DateTime? appointmentDate;
   final String? appointmentTimeSlot;
   final String? rejectionReason;
+  final Map<String, dynamic>? data;
 
   const Request({
     required this.id,
@@ -29,6 +30,7 @@ class Request extends Equatable {
     this.appointmentDate,
     this.appointmentTimeSlot,
     this.rejectionReason,
+    this.data,
   });
 
   @override
@@ -46,5 +48,6 @@ class Request extends Equatable {
         appointmentDate,
         appointmentTimeSlot,
         rejectionReason,
+        data,
       ];
 }

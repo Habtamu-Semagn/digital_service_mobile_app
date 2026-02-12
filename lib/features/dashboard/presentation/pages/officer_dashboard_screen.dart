@@ -7,6 +7,10 @@ import '../bloc/dashboard_bloc.dart';
 import '../../../queue/presentation/bloc/queue_bloc.dart';
 import '../../../queue/domain/entities/queue.dart' as entity;
 import '../../domain/entities/service.dart';
+import '../bloc/officer_bloc.dart';
+import '../../../appointment/domain/entities/appointment.dart';
+import '../../../requests/domain/entities/request.dart';
+import 'package:intl/intl.dart';
 
 class OfficerDashboardScreen extends StatefulWidget {
   const OfficerDashboardScreen({super.key});
@@ -25,6 +29,13 @@ class _OfficerDashboardScreenState extends State<OfficerDashboardScreen> {
     context.read<DashboardBloc>().add(DashboardLoadServices());
   }
 
+  void _loadSectorData() {
+    if (_selectedSectorId != null) {
+      context.read<QueueBloc>().add(QueueLoadList(sectorId: _selectedSectorId!));
+      context.read<OfficerBloc>().add(OfficerLoadSectorData(_selectedSectorId!));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -32,8 +43,8 @@ class _OfficerDashboardScreenState extends State<OfficerDashboardScreen> {
 
     final List<Widget> pages = [
       _buildQueueMonitor(context, l10n, theme),
-      const Center(child: Text('Appointments (Officer)')),
-      const Center(child: Text('Requests (Officer)')),
+      _buildAppointmentsList(context, theme),
+      _buildRequestsList(context, theme),
       _buildProfileContent(context, l10n, theme),
     ];
 
@@ -43,11 +54,7 @@ class _OfficerDashboardScreenState extends State<OfficerDashboardScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () {
-              if (_selectedSectorId != null) {
-                context.read<QueueBloc>().add(QueueLoadList(sectorId: _selectedSectorId!));
-              }
-            },
+            onPressed: _loadSectorData,
           ),
         ],
       ),
@@ -57,21 +64,32 @@ class _OfficerDashboardScreenState extends State<OfficerDashboardScreen> {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: Colors.green),
             );
-            // Refresh list
-            if (_selectedSectorId != null) {
-              context.read<QueueBloc>().add(QueueLoadList(sectorId: _selectedSectorId!));
-            }
+            _loadSectorData();
           } else if (state is QueueError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message), backgroundColor: Colors.red),
             );
           }
         },
-        child: Column(
-          children: [
-            _buildSectorSelector(context, theme),
-            Expanded(child: pages[_selectedIndex]),
-          ],
+        child: BlocListener<OfficerBloc, OfficerState>(
+          listener: (context, state) {
+            if (state is OfficerActionSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message), backgroundColor: Colors.green),
+              );
+              _loadSectorData();
+            } else if (state is OfficerError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+              );
+            }
+          },
+          child: Column(
+            children: [
+              _buildSectorSelector(context, theme),
+              Expanded(child: pages[_selectedIndex]),
+            ],
+          ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -92,16 +110,15 @@ class _OfficerDashboardScreenState extends State<OfficerDashboardScreen> {
     return BlocBuilder<DashboardBloc, DashboardState>(
       builder: (context, state) {
         if (state is DashboardLoaded) {
-          // Get unique sectors from services
-          final sectors = state.services
-              .map((s) => s.sector)
-              .toSet()
-              .map((name) => {'id': name, 'name': name})
+          // Get unique sectors from services using sectorId as the key
+          final sectorMap = {for (var s in state.services) s.sectorId: s.sector};
+          final sectors = sectorMap.entries
+              .map((e) => {'id': e.key, 'name': e.value})
               .toList();
           
           if (_selectedSectorId == null && sectors.isNotEmpty) {
             _selectedSectorId = sectors.first['id'] as String;
-            context.read<QueueBloc>().add(QueueLoadList(sectorId: _selectedSectorId!));
+            _loadSectorData();
           }
 
           return Container(
@@ -123,7 +140,7 @@ class _OfficerDashboardScreenState extends State<OfficerDashboardScreen> {
                       setState(() {
                         _selectedSectorId = sector['id'] as String;
                       });
-                      context.read<QueueBloc>().add(QueueLoadList(sectorId: _selectedSectorId!));
+                      _loadSectorData();
                     },
                     selectedColor: theme.colorScheme.primary.withOpacity(0.2),
                     checkmarkColor: theme.colorScheme.primary,
@@ -304,5 +321,130 @@ class _OfficerDashboardScreenState extends State<OfficerDashboardScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildAppointmentsList(BuildContext context, ThemeData theme) {
+    return BlocBuilder<OfficerBloc, OfficerState>(
+      builder: (context, state) {
+        if (state is OfficerLoading) return const Center(child: CircularProgressIndicator());
+        if (state is OfficerDataLoaded) {
+          final appointments = state.appointments;
+          if (appointments.isEmpty) return const Center(child: Text('No appointments for this sector'));
+          
+          return ListView.builder(
+            itemCount: appointments.length,
+            padding: const EdgeInsets.all(16),
+            itemBuilder: (context, index) {
+              final app = appointments[index];
+              return Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+                    child: const Icon(Icons.calendar_today, size: 20),
+                  ),
+                  title: Text(app.serviceName),
+                  subtitle: Text('${DateFormat('MMM d, yyyy').format(app.appointmentDate)} • ${app.timeSlot}'),
+                  trailing: Text(app.status, style: TextStyle(fontWeight: FontWeight.bold, color: _getStatusColor(app.status))),
+                ),
+              );
+            },
+          );
+        }
+        return const Center(child: Text('Select a sector to load data'));
+      },
+    );
+  }
+
+  Widget _buildRequestsList(BuildContext context, ThemeData theme) {
+    return BlocBuilder<OfficerBloc, OfficerState>(
+      builder: (context, state) {
+        if (state is OfficerLoading) return const Center(child: CircularProgressIndicator());
+        if (state is OfficerDataLoaded) {
+          final requests = state.requests;
+          if (requests.isEmpty) return const Center(child: Text('No service requests for this sector'));
+
+          return ListView.builder(
+            itemCount: requests.length,
+            padding: const EdgeInsets.all(16),
+            itemBuilder: (context, index) {
+              final req = requests[index];
+              return Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                child: ExpansionTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.orange.withOpacity(0.1),
+                    child: const Icon(Icons.description, size: 20, color: Colors.orange),
+                  ),
+                  title: Text(req.serviceName),
+                  subtitle: Text('Status: ${req.status}'),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Data:', style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text(req.data.toString()),
+                          const SizedBox(height: 16),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              TextButton(
+                                onPressed: () => _updateRequestStatus(context, req.id, 'REJECTED'),
+                                child: const Text('REJECT', style: TextStyle(color: Colors.red)),
+                              ),
+                              const SizedBox(width: 8),
+                              ElevatedButton(
+                                onPressed: () => _updateRequestStatus(context, req.id, 'COMPLETED'),
+                                child: const Text('APPROVE/COMPLETE'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        }
+        return const Center(child: Text('Select a sector to load data'));
+      },
+    );
+  }
+
+  void _updateRequestStatus(BuildContext context, String requestId, String status) {
+    if (_selectedSectorId != null) {
+      context.read<OfficerBloc>().add(OfficerUpdateRequestStatus(
+        requestId: requestId,
+        status: status,
+        sectorId: _selectedSectorId!,
+      ));
+    }
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toUpperCase()) {
+      case 'WAITING':
+      case 'PENDING':
+        return Colors.orange;
+      case 'CALLING':
+      case 'SCHEDULED':
+        return Colors.blue;
+      case 'PROCESSING':
+      case 'IN_SERVICE':
+        return Colors.indigo;
+      case 'COMPLETED':
+        return Colors.green;
+      case 'CANCELLED':
+      case 'REJECTED':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
   }
 }

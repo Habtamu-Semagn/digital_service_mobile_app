@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:digital_service_app/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:digital_service_app/features/admin/presentation/bloc/admin_bloc.dart';
 import 'package:digital_service_app/features/admin/data/models/admin_stats_model.dart';
@@ -200,9 +201,22 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             },
           ),
           const Divider(),
-          // Placeholder for Sector/Service management
-          ListTile(leading: const Icon(Icons.layers), title: const Text('Manage Sectors'), onTap: () {}),
-          ListTile(leading: const Icon(Icons.build), title: const Text('Manage Services'), onTap: () {}),
+          ListTile(
+            leading: const Icon(Icons.layers),
+            title: const Text('Manage Sectors'),
+            onTap: () {
+              Navigator.pop(context);
+              context.push('/admin/sectors');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.build),
+            title: const Text('Manage Services'),
+            onTap: () {
+              Navigator.pop(context);
+              context.push('/admin/services');
+            },
+          ),
           const Spacer(),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
