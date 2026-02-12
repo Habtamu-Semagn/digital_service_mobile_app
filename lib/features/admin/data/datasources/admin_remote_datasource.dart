@@ -55,4 +55,13 @@ class AdminRemoteDataSource {
   Future<void> deleteService(String id) async {
     await _client.delete('/services/services/$id');
   }
+
+  // User Management
+  Future<void> updateUserRole(String userId, String role) async {
+    await _client.patch('/admin/users/$userId/role', data: {'role': role});
+  }
+
+  Future<void> deleteUser(String userId) async {
+    await _client.delete('/admin/users/$userId');
+  }
 }

@@ -111,4 +111,24 @@ class AdminRepositoryImpl implements AdminRepository {
       return Left(ErrorHandler.handleException(e));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> updateUserRole(String userId, String role) async {
+    try {
+      await remoteDataSource.updateUserRole(userId, role);
+      return const Right(null);
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteUser(String userId) async {
+    try {
+      await remoteDataSource.deleteUser(userId);
+      return const Right(null);
+    } catch (e) {
+      return Left(ErrorHandler.handleException(e));
+    }
+  }
 }

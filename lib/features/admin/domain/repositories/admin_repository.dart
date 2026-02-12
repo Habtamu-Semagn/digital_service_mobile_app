@@ -19,4 +19,8 @@ abstract class AdminRepository {
   Future<Either<Failure, void>> createService(Map<String, dynamic> serviceData);
   Future<Either<Failure, void>> updateService(String id, Map<String, dynamic> serviceData);
   Future<Either<Failure, void>> deleteService(String id);
+
+  // User Management
+  Future<Either<Failure, void>> updateUserRole(String userId, String role);
+  Future<Either<Failure, void>> deleteUser(String userId);
 }

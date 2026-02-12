@@ -126,7 +126,37 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
             title: Text(user.fullName),
             subtitle: Text('${user.role} • ${user.phoneNumber ?? "No phone"}'),
-            trailing: const Icon(Icons.more_vert),
+            trailing: PopupMenuButton<String>(
+              onSelected: (value) {
+                if (value == 'role') {
+                  _showRoleDialog(context, user);
+                } else if (value == 'delete') {
+                  _showDeleteConfirmDialog(context, user);
+                }
+              },
+              itemBuilder: (context) => [
+                const PopupMenuItem(
+                  value: 'role',
+                  child: Row(
+                    children: [
+                      Icon(Icons.admin_panel_settings, size: 20),
+                      SizedBox(width: 8),
+                      Text('Change Role'),
+                    ],
+                  ),
+                ),
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete, size: 20, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Delete User', style: TextStyle(color: Colors.red)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -246,6 +276,62 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             Text(title, style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.bold, color: color.withOpacity(0.8)), textAlign: TextAlign.center),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showRoleDialog(BuildContext context, User user) {
+    String selectedRole = user.role;
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: Text('Change Role for ${user.fullName}'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: ['CITIZEN', 'OFFICER', 'ADMIN'].map((role) {
+              return RadioListTile<String>(
+                title: Text(role),
+                value: role,
+                groupValue: selectedRole,
+                onChanged: (value) {
+                  if (value != null) setDialogState(() => selectedRole = value);
+                },
+              );
+            }).toList(),
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                context.read<AdminBloc>().add(AdminUpdateUserRole(user.id, selectedRole));
+              },
+              child: const Text('Update Role'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteConfirmDialog(BuildContext context, User user) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete User'),
+        content: Text('Are you sure you want to delete ${user.fullName}? This action cannot be undone.'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<AdminBloc>().add(AdminDeleteUser(user.id));
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
       ),
     );
   }

@@ -59,6 +59,22 @@ class AdminDeleteService extends AdminEvent {
   List<Object?> get props => [id];
 }
 
+// User Events
+class AdminUpdateUserRole extends AdminEvent {
+  final String userId;
+  final String role;
+  const AdminUpdateUserRole(this.userId, this.role);
+  @override
+  List<Object?> get props => [userId, role];
+}
+
+class AdminDeleteUser extends AdminEvent {
+  final String userId;
+  const AdminDeleteUser(this.userId);
+  @override
+  List<Object?> get props => [userId];
+}
+
 // States
 abstract class AdminState extends Equatable {
   const AdminState();
@@ -125,6 +141,10 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<AdminCreateService>(_onCreateService);
     on<AdminUpdateService>(_onUpdateService);
     on<AdminDeleteService>(_onDeleteService);
+
+    // User handlers
+    on<AdminUpdateUserRole>(_onUpdateUserRole);
+    on<AdminDeleteUser>(_onDeleteUser);
   }
 
   Future<void> _onLoadStats(AdminLoadStats event, Emitter<AdminState> emit) async {
@@ -216,6 +236,30 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     result.fold(
       (failure) => emit(AdminError(failure.message)),
       (_) => emit(const AdminActionSuccess('Service deleted successfully')),
+    );
+  }
+
+  Future<void> _onUpdateUserRole(AdminUpdateUserRole event, Emitter<AdminState> emit) async {
+    emit(AdminLoading());
+    final result = await adminRepository.updateUserRole(event.userId, event.role);
+    result.fold(
+      (failure) => emit(AdminError(failure.message)),
+      (_) {
+        emit(const AdminActionSuccess('User role updated successfully'));
+        add(AdminLoadUsers());
+      },
+    );
+  }
+
+  Future<void> _onDeleteUser(AdminDeleteUser event, Emitter<AdminState> emit) async {
+    emit(AdminLoading());
+    final result = await adminRepository.deleteUser(event.userId);
+    result.fold(
+      (failure) => emit(AdminError(failure.message)),
+      (_) {
+        emit(const AdminActionSuccess('User deleted successfully'));
+        add(AdminLoadUsers());
+      },
     );
   }
 }
