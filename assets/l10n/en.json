@@ -118,5 +118,6 @@
     "hours": "hours",
     "days": "days",
     "selectTimeSlot": "Select Time Slot",
-    "confirmBooking": "Confirm Booking"
+    "confirmBooking": "Confirm Booking",
+    "appointmentPendingApproval": "Appointment submitted and pending approval"
 }

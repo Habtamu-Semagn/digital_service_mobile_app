@@ -54,7 +54,7 @@ class _AppointmentBookScreenState extends State<AppointmentBookScreen> {
           if (state is AppointmentBooked) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(l10n.appointmentBooked),
+                content: Text(l10n.translate('appointmentPendingApproval')),
                 backgroundColor: AppTheme.successColor,
               ),
             );

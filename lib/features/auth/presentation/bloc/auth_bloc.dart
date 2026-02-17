@@ -30,7 +30,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
       result.fold(
         (failure) => emit(AuthUnauthenticated()),
-        (user) => emit(AuthAuthenticated(user: user)),
+        (user) {
+          if (user.role.toUpperCase() == 'CITIZEN') {
+            emit(AuthAuthenticated(user: user));
+          } else {
+            // Log out non-citizen users if they are somehow authenticated on mobile
+            authRepository.logout();
+            emit(AuthUnauthenticated());
+          }
+        },
       );
     } else {
       emit(AuthUnauthenticated());
@@ -47,7 +55,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     result.fold(
       (failure) => emit(AuthError(message: failure.message)),
-      (user) => emit(AuthAuthenticated(user: user)),
+      (user) {
+        if (user.role.toUpperCase() == 'CITIZEN') {
+          emit(AuthAuthenticated(user: user));
+        } else {
+          // Block Admin/Officer login on mobile
+          authRepository.logout();
+          emit(const AuthError(
+            message: 'Mobile access is restricted to Citizens only. Please use the web dashboard.',
+          ));
+        }
+      },
     );
   }
 

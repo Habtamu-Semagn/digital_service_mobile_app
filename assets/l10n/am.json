@@ -116,5 +116,6 @@
     "yesterday": "ትላንት",
     "minutes": "ደቂቃዎች",
     "hours": "ሰዓታት",
-    "days": "ቀናት"
+    "days": "ቀናት",
+    "appointmentPendingApproval": "ቀጠሮ ተይዟል እና ፈቃድ በመጠባበቅ ላይ ነው"
 }

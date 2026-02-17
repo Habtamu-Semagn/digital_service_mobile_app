@@ -134,19 +134,21 @@ class _QueueGenerateScreenState extends State<QueueGenerateScreen> {
 
                   // Instructions
                   Card(
-                    color: AppTheme.infoColor.withOpacity(0.1),
+                    color: (queue.status.toUpperCase() == 'COMPLETED' ? AppTheme.successColor : AppTheme.infoColor).withOpacity(0.1),
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(
                         children: [
                           Icon(
-                            Icons.info_outline,
-                            color: AppTheme.infoColor,
+                            queue.status.toUpperCase() == 'COMPLETED' ? Icons.check_circle_outline : Icons.info_outline,
+                            color: queue.status.toUpperCase() == 'COMPLETED' ? AppTheme.successColor : AppTheme.infoColor,
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Please wait for your number to be called. You will be notified when it\'s your turn.',
+                              queue.status.toUpperCase() == 'COMPLETED' 
+                                ? 'Your service has been completed. Thank you!'
+                                : 'Please wait for your number to be called. You will be notified when it\'s your turn.',
                               style: theme.textTheme.bodyMedium,
                             ),
                           ),
@@ -154,6 +156,24 @@ class _QueueGenerateScreenState extends State<QueueGenerateScreen> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 16),
+
+                  // Take New Ticket Button (Only when completed)
+                  if (queue.status.toUpperCase() == 'COMPLETED')
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        context.read<QueueBloc>().add(QueueStopPolling());
+                        context.go('/dashboard');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      icon: const Icon(Icons.add_circle_outline),
+                      label: const Text('Take Another Service', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
                   const SizedBox(height: 16),
 
                   // Back to Dashboard Button

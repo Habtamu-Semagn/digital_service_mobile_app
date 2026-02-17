@@ -27,11 +27,7 @@ import '../../features/requests/data/datasources/request_remote_datasource.dart'
 import '../../features/requests/data/repositories/request_repository_impl.dart';
 import '../../features/requests/domain/repositories/request_repository.dart';
 import '../../features/requests/presentation/bloc/request_bloc.dart';
-import '../../features/admin/data/datasources/admin_remote_datasource.dart';
-import '../../features/admin/data/repositories/admin_repository_impl.dart';
-import '../../features/admin/domain/repositories/admin_repository.dart';
-import '../../features/admin/presentation/bloc/admin_bloc.dart';
-import '../../features/dashboard/presentation/bloc/officer_bloc.dart';
+
 
 final getIt = GetIt.instance;
 
@@ -150,26 +146,5 @@ Future<void> setupDependencyInjection() async {
     () => RequestBloc(requestRepository: getIt<RequestRepository>()),
   );
 
-  // Admin Feature
-  getIt.registerLazySingleton<AdminRemoteDataSource>(
-    () => AdminRemoteDataSource(getIt<DioClient>()),
-  );
 
-  getIt.registerLazySingleton<AdminRepository>(
-    () => AdminRepositoryImpl(
-      remoteDataSource: getIt<AdminRemoteDataSource>(),
-    ),
-  );
-
-  getIt.registerFactory<AdminBloc>(
-    () => AdminBloc(adminRepository: getIt<AdminRepository>()),
-  );
-
-  // Officer Feature
-  getIt.registerFactory<OfficerBloc>(
-    () => OfficerBloc(
-      appointmentRepository: getIt<AppointmentRepository>(),
-      requestRepository: getIt<RequestRepository>(),
-    ),
-  );
 }
